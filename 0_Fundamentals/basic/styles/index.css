@@ -1,0 +1,59 @@
+/* https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/CSS_basics */
+
+html {
+    font-size: 10px;
+    /* px means "pixels": the base font size is now 10 pixels high  */
+    font-family: "Open Sans", sans-serif;
+    /* this should be the rest of the output you got from Google fonts */
+}
+
+body {
+    width: 600px;
+    /* First value affects top/bottom, second value affects left/right */
+    margin: 20px auto;
+    background-color: #FF9500;
+    padding: 0 20px 20px 20px;
+    border: 2px solid white;
+}
+
+h1 {
+    margin: 0;
+    padding: 20px 0;
+    font-size: 60px;
+    text-align: center;
+    color: white;
+    /* Horizontal offset, vertical offset, blur radius, base color */
+    text-shadow: 3px 3px 10px black;
+}
+
+img {
+    /* Makes image behave like a block element rather than inline */
+    display: block;
+    margin: 0 auto;
+}
+
+p,
+li,
+a {
+    font-size: 16px;
+    line-height: 2;
+    letter-spacing: 1px;
+}
+
+html {
+    background-color: #00539F;
+    color: black;
+}
+
+a:link {
+    color: aliceblue;
+}
+
+a:visited {
+    color: lightpink;
+}
+
+a:hover,
+a:active {
+    color: hotpink;
+}
