@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useEffect } from 'react'
+import axios from 'axios'
 
 const Search = ({ onChange, value }) => {
   return <>
@@ -39,10 +41,10 @@ const Contacts = ({ contacts }) => {
   </>
 }
 
-const App = ({ initialContacts }) => {
+const App = (props) => {
 
   /* State */
-  const [contacts, setContacts] = useState(initialContacts)
+  const [contacts, setContacts] = useState([])
   const [newName, setNewName] = useState('')
   const [newPhoneNumber, setPhoneNumber] = useState('')
   const [searchText, setSearchText] = useState('')
@@ -69,6 +71,18 @@ const App = ({ initialContacts }) => {
       setPhoneNumber('')
     }
   }
+
+  /* Effect Hooks */
+  
+  useEffect(() => {
+    console.log('GET http://localhost:3001/contacts')
+    axios
+      .get('http://localhost:3001/contacts')
+      .then(response => {
+        console.log('Contacts received')
+        setContacts(response.data)
+      })
+  }, [])
 
   // Filter the contacts
   const filteredContacts = contacts.filter(contact =>
