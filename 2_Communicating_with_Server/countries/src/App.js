@@ -3,60 +3,18 @@ import { useEffect } from 'react';
 import './App.css';
 import axios from 'axios'
 
-const SearchBar = ({ value, onChange }) => {
-  return (
-    <form>
-      <label>
-        Search Country Name:
-        <input type="text" name="search" onChange={onChange} value={value} />
-      </label>
-    </form>
-  )
-}
-
-const CountryInfo = ({ country, onClose }) => {
-  return (
-    <>
-      <h1>{country.name.common}</h1>
-      <p>Capital: {country.capital}</p>
-      <p>Area: {country.area}</p>
-      <h2>Languages</h2>
-      <ul>
-        {Object.values(country.languages).map(language => <li key={language}>{language}</li>)}
-      </ul>
-      <img src={country.flags.png}></img><br /><br />
-      <button onClick={onClose}>Close</button>
-    </>
-  )
-}
-
-const CountryListItem = ({ country, onClick }) => {
-  return (
-    <li key={country.name.common}>
-      {country.name.common}
-      <button onClick={() => onClick(country)}>Info</button>
-    </li>
-  )
-}
-
-const CountryList = ({ countries, showInfoHandler }) => {
-  return (
-    <ul>
-      {countries.map(country =>
-        <CountryListItem
-          key={country.name.common}
-          country={country}
-          onClick={showInfoHandler}
-        />)}
-    </ul>
-  )
-}
+import CountryList from './CountryList';
+import CountryInfo from './CountryInfo';
+import SearchBar from './SearchBar';
 
 function App() {
 
+  /* State */
   const [selectedCountry, setSelectedCountry] = useState(null)
   const [countries, setCountries] = useState([])
   const [searchValue, setSearchValue] = useState("")
+
+  /* Handlers */
 
   // Handler for changing search text
   const searchOnChange = (event) => {
@@ -76,6 +34,8 @@ function App() {
     setSelectedCountry(null)
   }
 
+  /* Effects */
+  
   // Effect for retrieving countries
   const retrieveCountries = useEffect(() => {
     console.log('GET countries from: https://restcountries.com/v3.1/all')
