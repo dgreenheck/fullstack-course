@@ -6,6 +6,7 @@ import axios from 'axios'
 import Contacts from './components/Contacts'
 import AddContactForm from './components/AddContactForm'
 import SearchBar from './components/SearchBar'
+import Notification from './components/Notification'
 
 /* Services */
 import contactService from './services/contacts'
@@ -17,6 +18,8 @@ const App = (props) => {
   const [newName, setNewName] = useState('')
   const [newPhoneNumber, setPhoneNumber] = useState('')
   const [searchText, setSearchText] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   /* Event Handlers */
   const updateNewName = (event) => setNewName(event.target.value)
@@ -40,6 +43,14 @@ const App = (props) => {
             setNewName('')
             setPhoneNumber('')
           })
+          .catch(error => {
+            setErrorMessage(`Contact ${existingContact.name} no longer exists.`)
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+            // Remove stale contact
+            setContacts(contacts.filter(contact => contact.id !== existingContact.id))
+          })
       }
     } else {
       const contact = {
@@ -54,6 +65,10 @@ const App = (props) => {
           setContacts(contacts.concat(newContact))
           setNewName('')
           setPhoneNumber('')
+          setNotificationMessage(`Added ${newContact.name}`)
+          setTimeout(() => {
+            setNotificationMessage(null)
+          }, 5000)
         })
     }
   }
@@ -67,7 +82,10 @@ const App = (props) => {
           setContacts(contacts.filter(contact => contact.id !== contactToDelete.id))
         })
         .catch(error => {
-          alert(`Contact ${contactToDelete.name} was already deleted.`)
+          setErrorMessage(`Contact ${contactToDelete.name} no longer exists.`)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
           setContacts(contacts.filter(contact => contact.id !== contactToDelete.id))
         })
     }
@@ -93,6 +111,12 @@ const App = (props) => {
   return (
     <div>
       <h1>Phonebook</h1>
+      {notificationMessage !== null &&
+        <Notification message={notificationMessage} isError={false} />
+      }
+      {errorMessage !== null &&
+        <Notification message={errorMessage} isError={true} />
+      }
       <SearchBar
         onChange={updateSearchText}
         value={searchText}

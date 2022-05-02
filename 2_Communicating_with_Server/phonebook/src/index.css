@@ -1,8 +1,19 @@
-html {
-  font-size: larger;
+.notification {
+  color: green;
+  background-color: lightgrey;
+  font-size: 20px;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
+.error {
+  color: red;
+  background-color: lightgrey;
+  font-size: 20px;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
 }
