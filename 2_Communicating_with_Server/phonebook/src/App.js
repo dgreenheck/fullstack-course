@@ -2,44 +2,13 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import axios from 'axios'
 
-const Search = ({ onChange, value }) => {
-  return <>
-    <h2>Search Contacts</h2>
-    <div>
-      Search: <input onChange={onChange} value={value} />
-    </div>
-  </>
-}
+/* Components */
+import Contacts from './components/Contacts'
+import AddContactForm from './components/AddContactForm'
+import SearchBar from './components/SearchBar'
 
-const AddContactForm = (props) => {
-  return <>
-    <h2>Add Contact</h2>
-    <form onSubmit={props.onSubmit}>
-      <div>
-        Name: <input onChange={props.onNameChange} value={props.newContact.name} />
-      </div>
-      <div>
-        Phone #: <input onChange={props.onPhoneNumberChange} value={props.newContact.phoneNumber} />
-      </div>
-      <div>
-        <button type="submit">Add Contact</button>
-      </div>
-    </form>
-  </>
-}
-
-const Contacts = ({ contacts }) => {
-  return <>
-    <h2>Contacts</h2>
-    <ul>
-      {contacts.map(contact =>
-        <li key={contact.name}>
-          {contact.name} {contact.phoneNumber}
-        </li>
-      )}
-    </ul>
-  </>
-}
+/* Services */
+import contactService from './services/contacts'
 
 const App = (props) => {
 
@@ -58,29 +27,61 @@ const App = (props) => {
     /* Don't want to refresh the page */
     event.preventDefault()
 
-    // If contact is already in phone book, don't add them
-    if (contacts.some(contact => contact.name === newName)) {
-      alert(`${newName} is already added to the phonebook.`)
+    // If contact is already in phone book, ask user if they want to update the phone number
+    let existingContact = contacts.find(contact => contact.name === newName)
+    if (existingContact != null) {
+      if (window.confirm(`${newName} is already added to the phonebook. Replace old number with a new one?`)) {
+        const updatedContact = { ...existingContact, phoneNumber: newPhoneNumber }
+        contactService
+          .update(existingContact.id, updatedContact)
+          .then(newContact => {
+            console.log(`Updated phone number for contact ${newContact.name} from ${existingContact.phoneNumber} to ${newContact.phoneNumber}`)
+            setContacts(contacts.map(contact => contact.id === existingContact.id ? updatedContact : contact))
+            setNewName('')
+            setPhoneNumber('')
+          })
+      }
     } else {
       const contact = {
         name: newName,
         phoneNumber: newPhoneNumber
       }
-      setContacts(contacts.concat(contact))
-      setNewName('')
-      setPhoneNumber('')
+
+      contactService
+        .create(contact)
+        .then(newContact => {
+          console.log(`New contact added: ${newContact.name} ${newContact.phoneNumber}`)
+          setContacts(contacts.concat(newContact))
+          setNewName('')
+          setPhoneNumber('')
+        })
+    }
+  }
+
+  const deleteContact = contactToDelete => {
+    if (window.confirm(`Delete ${contactToDelete.name}?`) == true) {
+      contactService
+        .deleteContact(contactToDelete.id)
+        .then(() => {
+          console.log(`Deletion of ${contactToDelete.name} was successful.`)
+          setContacts(contacts.filter(contact => contact.id !== contactToDelete.id))
+        })
+        .catch(error => {
+          alert(`Contact ${contactToDelete.name} was already deleted.`)
+          setContacts(contacts.filter(contact => contact.id !== contactToDelete.id))
+        })
     }
   }
 
   /* Effect Hooks */
-  
+
   useEffect(() => {
     console.log('GET http://localhost:3001/contacts')
-    axios
-      .get('http://localhost:3001/contacts')
-      .then(response => {
+    contactService
+      .getAll()
+      .then(initialContacts => {
         console.log('Contacts received')
-        setContacts(response.data)
+        setContacts(initialContacts)
       })
   }, [])
 
@@ -92,17 +93,23 @@ const App = (props) => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <Search onChange={updateSearchText} value={searchText} />
-      <AddContactForm 
-        newContact = {{ 
-         name: newName,
+      <SearchBar
+        onChange={updateSearchText}
+        value={searchText}
+      />
+      <AddContactForm
+        newContact={{
+          name: newName,
           phoneNumber: newPhoneNumber
         }}
-        onSubmit={addContact} 
+        onSubmit={addContact}
         onNameChange={updateNewName}
         onPhoneNumberChange={updatePhoneNumber}
       />
-      <Contacts contacts={filteredContacts} />
+      <Contacts
+        contacts={filteredContacts}
+        deleteContact={deleteContact}
+      />
     </div>
   )
 }
