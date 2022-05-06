@@ -1,0 +1,32 @@
+### Home page
+GET http://localhost:3001/
+
+### Get all notes
+GET http://localhost:3001/api/notes
+
+### Get single note
+GET http://localhost:3001/api/notes/1
+
+### Add note
+POST http://localhost:3001/api/notes
+Content-Type: application/json
+
+{
+  "content": "test note",
+  "important": true
+}
+
+### Delete note
+DELETE http://localhost:3001/api/notes/1
+
+### Missing Content
+POST http://localhost:3001/api/notes
+Content-Type: application/json
+
+{
+  "date": "2022-05-30T17:30:31.098Z",
+  "important": true
+}
+
+### Unknown Endpoint
+GET http://localhost:3001/api/numbers
