@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useEffect } from 'react'
-import axios from 'axios'
 
 /* Components */
 import Contacts from './components/Contacts'
@@ -36,10 +35,13 @@ const App = (props) => {
       if (window.confirm(`${newName} is already added to the phonebook. Replace old number with a new one?`)) {
         const updatedContact = { ...existingContact, phoneNumber: newPhoneNumber }
         contactService
-          .update(existingContact.id, updatedContact)
+          .update(existingContact._id, updatedContact)
           .then(newContact => {
-            console.log(`Updated phone number for contact ${newContact.name} from ${existingContact.phoneNumber} to ${newContact.phoneNumber}`)
-            setContacts(contacts.map(contact => contact.id === existingContact.id ? updatedContact : contact))
+            setNotificationMessage(`Updated phone number for contact ${newContact.name} from ${existingContact.phoneNumber} to ${newContact.phoneNumber}`)
+            setTimeout(() => {
+              setNotificationMessage(null)
+            }, 5000)
+            setContacts(contacts.map(contact => contact._id === existingContact._id ? updatedContact : contact))
             setNewName('')
             setPhoneNumber('')
           })
@@ -49,7 +51,7 @@ const App = (props) => {
               setErrorMessage(null)
             }, 5000)
             // Remove stale contact
-            setContacts(contacts.filter(contact => contact.id !== existingContact.id))
+            setContacts(contacts.filter(contact => contact._id !== existingContact._id))
           })
       }
     } else {
@@ -74,19 +76,20 @@ const App = (props) => {
   }
 
   const deleteContact = contactToDelete => {
-    if (window.confirm(`Delete ${contactToDelete.name}?`) == true) {
+    console.log(contactToDelete)
+    if (window.confirm(`Delete ${contactToDelete.name}?`)) {
       contactService
-        .deleteContact(contactToDelete.id)
+        .deleteContact(contactToDelete._id)
         .then(() => {
           console.log(`Deletion of ${contactToDelete.name} was successful.`)
-          setContacts(contacts.filter(contact => contact.id !== contactToDelete.id))
+          setContacts(contacts.filter(contact => contact._id !== contactToDelete._id))
         })
         .catch(error => {
           setErrorMessage(`Contact ${contactToDelete.name} no longer exists.`)
           setTimeout(() => {
             setErrorMessage(null)
           }, 5000)
-          setContacts(contacts.filter(contact => contact.id !== contactToDelete.id))
+          setContacts(contacts.filter(contact => contact._id !== contactToDelete._id))
         })
     }
   }
@@ -94,7 +97,6 @@ const App = (props) => {
   /* Effect Hooks */
 
   useEffect(() => {
-    console.log('GET http://localhost:3001/contacts')
     contactService
       .getAll()
       .then(initialContacts => {
