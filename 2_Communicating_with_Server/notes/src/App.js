@@ -1,90 +1,87 @@
-import { useState, useEffect } from 'react'
+import { React, useState, useEffect } from 'react';
 
 /* Components */
-import Note from './components/Note'
-import Notification from './components/Notification'
+import Note from './components/Note';
+import Notification from './components/Notification';
 
 /* Services */
-import noteService from './services/notes'
+import noteService from './services/notes';
 
 const Footer = () => {
   const footerStyle = {
     color: 'green',
     fontStyle: 'italic',
     fontSize: 16
-  }
+  };
 
   return (
     <div style={footerStyle}>
       <br />
       <em>Note app, Author: Dan Greenheck, Copyright 2022</em>
     </div>
-  )
-}
+  );
+};
 
 const App = () => {
-  const [notes, setNotes] = useState([])
-  const [newNote, setNewNote] = useState('')
-  const [showAll, setShowAll] = useState(true)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [notes, setNotes] = useState([]);
+  const [newNote, setNewNote] = useState('');
+  const [showAll, setShowAll] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     noteService
       .getAll()
       .then(initialNotes => {
-        setNotes(initialNotes)
-      })
-  }, [])
+        setNotes(initialNotes);
+      });
+  }, []);
 
   const addNote = (event) => {
-    event.preventDefault()
+    event.preventDefault();
 
     const noteObject = {
       content: newNote,
       date: new Date().toISOString(),
       important: Math.random() > 0.5
-    }
+    };
 
     noteService
       .create(noteObject)
       .then(returnedNote => {
-        setNotes(notes.concat(returnedNote))
-        setNewNote('')
-      })
-  }
+        setNotes(notes.concat(returnedNote));
+        setNewNote('');
+      });
+  };
 
   const toggleImportanceOf = (id) => {
-    const note = notes.find(n => n.id === id)
+    const note = notes.find(n => n.id === id);
 
     // Create shallow copy of 'note', negating 'important'
-    const changedNote = { ...note, important: !note.important }
+    const changedNote = { ...note, important: !note.important };
 
     noteService
       .update(id, changedNote)
       .then(returnedNote => {
-        // Replace old note with response from server
-        console.log(`Updated importance of note ${returnedNote.id} to ${returnedNote.important}`)
-        setNotes(notes.map(note => note.id !== id ? note : returnedNote))
+        setNotes(notes.map(note => note.id !== id ? note : returnedNote));
       })
-      .catch(error => {
+      .catch(() => {
         setErrorMessage(
           `The note '${note.content}' was already deleted from server`
-        )
+        );
         setTimeout(() => {
-          setErrorMessage(null)
-        }, 5000)
-        setNotes(notes.filter(n => n.id !== id))
-      })
-  }
+          setErrorMessage(null);
+        }, 5000);
+        setNotes(notes.filter(n => n.id !== id));
+      });
+  };
 
   const handleNoteChange = (event) => {
-    console.log(event.target.value)
-    setNewNote(event.target.value)
-  }
+    setNewNote(event.target.value);
+  };
 
   const notesToShow = showAll
     ? notes
-    : notes.filter(note => note.important)
+    : notes.filter(note => note.important);
 
   return (
     <div>
@@ -92,15 +89,15 @@ const App = () => {
       {errorMessage != null && <Notification message={errorMessage} />}
       <div>
         <button onClick={() => setShowAll(!showAll)}>
-          show {showAll ? 'important' : 'all' }
+          show {showAll ? 'important' : 'all'}
         </button>
-      </div>   
+      </div>
       <ul>
-        {notesToShow.map(note => 
-          <Note 
-            key={note.id} 
-            note={note} 
-            toggleImportance={() => toggleImportanceOf(note.id)}/>
+        {notesToShow.map(note =>
+          <Note
+            key={note.id}
+            note={note}
+            toggleImportance={() => toggleImportanceOf(note.id)} />
         )}
       </ul>
       <form onSubmit={addNote}>
@@ -112,7 +109,7 @@ const App = () => {
       </form>
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
