@@ -17,7 +17,7 @@ Content-Type: application/json
 }
 
 ### Delete note
-DELETE http://localhost:3001/api/notes/1
+DELETE http://localhost:3001/api/notes/6279ba0fdfd47fb3338f1487
 
 ### Missing Content
 POST http://localhost:3001/api/notes

@@ -1,7 +1,8 @@
+const config = require('../utils/config');
 const mongoose = require('mongoose');
 
-console.log(`connecting to ${process.env.MONGODB_URI}`);
-mongoose.connect(process.env.MONGODB_URI)
+console.log(`connecting to ${config.MONGODB_URI}`);
+mongoose.connect(config.MONGODB_URI)
   .then(result => {
     console.log('connected to MongoDB');
   })
@@ -10,8 +11,15 @@ mongoose.connect(process.env.MONGODB_URI)
   });
 
 const noteSchema = new mongoose.Schema({
-  content: String,
-  date: Date,
+  content: {
+    type: String,
+    minLength: 5,
+    required: true
+  },
+  date: {
+    type: Date,
+    required: true
+  },
   important: Boolean
 });
 

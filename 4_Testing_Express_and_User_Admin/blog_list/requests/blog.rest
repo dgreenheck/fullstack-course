@@ -1,0 +1,13 @@
+### Get All Notes
+GET http://localhost:3003/api/blogs
+
+### Add Note
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "My Blog 1",
+  "author": "Dan Greenheck",
+  "url": "www.google.com",
+  "likes": 232
+}
